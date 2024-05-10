@@ -1,0 +1,137 @@
+<!--
+    """Linux terminal emulator"""
+    Use it at your own risk. 
+    The provided code is reusable and offered "as-is" without any warranties. 
+    Attribution to the author is at your discretion.
+    find this code and other at: https://github.com/sathamneh/playground 
+ 
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Linux Terminal Simulator</title>
+    <style>
+        body {
+            font-family: monospace;
+            background-color: #333;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            align-items: center;
+        }
+
+        #terminal {
+            width: 80%;
+            height: 300px;
+            padding: 10px;
+            border: 1px solid #444;
+            border-radius: 10px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            background-color: black;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+        }
+
+        #input {
+            width: calc(100% - 20px);
+            padding: 10px;
+            border: none;
+            background: none;
+            color: #0f0;
+            font-size: 16px;
+            border-radius: 0;
+            outline: none;
+        }
+
+        #output span {
+            color: #0f0;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="terminal">
+        <div id="output"></div>
+        <input id="input" type="text" placeholder="zsh ~ % " autocomplete="off" />
+    </div>
+
+    <script>
+        const terminal = document.getElementById('terminal');
+        const output = document.getElementById('output');
+        const input = document.getElementById('input');
+
+        let commandHistory = [];
+        let currentCommandIndex = -1;
+
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                processCommand(input.value);
+                input.value = '';
+            } else if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+                navigateCommandHistory(e.key);
+            }
+        });
+
+        function processCommand(command) {
+            commandHistory.push(command);
+            currentCommandIndex = commandHistory.length - 1;
+            let response = executeCommand(command);
+            output.innerHTML += `<div><strong>${command}</strong><br>${response}</div>`;
+            output.scrollTop = output.scrollHeight;
+        }
+
+        function executeCommand(command) {
+            let args = command.split(" ");
+            switch (args[0]) {
+                case 'uname':
+                    return 'NAME="Linux"\nVERSION="5.10.0-0.bpo.3-SAthamneh64"\nID=linux\nPRETTY_NAME="Linux 5.10.0-0.bpo.3-SAthamneh64"';
+                case 'about':
+                    return 'This is a SAthamneh Linux terminal simulator running zsh-web.\nVersion 1.0';
+                case 'ls':
+                    return 'bin\nboot\ndata\ndev\netc\nhome\nlib\nlib64\nlost+found\nmedia\nmnt\nopt\nproc\nroot\nrun\nsbin\nsrv\nsys\ntmp\nusr\nvar';
+                case 'uptime':
+                    return 'up 15 days, 3:34, 1 user, load average: 0.25, 0.16, 0.11';
+                case 'ps':
+                    return args[1] === '-x' ? 'PID TTY      STAT   TIME COMMAND\n1 ?        Ss     0:06 /sbin/init splash\n937 ?        Sl     15:38 /usr/lib/packagekit/packagekitd\n...' : 'zsh: command option not supported: ' + command;
+                case 'help':
+                    return 'Available commands: os-release, about, ls, uptime, ps, help, who, w, ifconfig, netstat, curl, wget, free';
+                case 'who':
+                    return 'user     tty1         2023-05-09 12:34 (:0)';
+                case 'w':
+                    return '12:34:56 up 15 days,  3:34,  2 users,  load average: 0.25, 0.16, 0.11\nUSER     TTY      FROM             LOGIN@   IDLE   JCPU   PCPU WHAT';
+                case 'ifconfig':
+                    return 'eth0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500\n        inet 192.168.1.2  netmask 255.255.255.0  broadcast 192.168.1.255';
+                case 'netstat':
+                    return 'Active Internet connections (w/o servers)\nProto Recv-Q Send-Q Local Address           Foreign Address         State';
+                case 'curl':
+                    return args[1] ? `Fetching data from ${args[1]}...` : 'curl: no URL specified!';
+                case 'wget':
+                    return args[1] ? `Downloading file from ${args[1]}...` : 'wget: no URL specified!';
+                case 'free':
+                    return '              total        used        free      shared  buff/cache   available\nMem:       16384256    8423910     2457610      504922     5416736    6785210\nSwap:       2097148          0     2097148';
+                default:
+                    return `zsh: command not found: ${command}`;
+            }
+        }
+
+
+        function navigateCommandHistory(key) {
+            if (key === 'ArrowUp' && currentCommandIndex > 0) {
+                currentCommandIndex--;
+            } else if (key === 'ArrowDown' && currentCommandIndex < commandHistory.length - 1) {
+                currentCommandIndex++;
+            }
+            input.value = commandHistory[currentCommandIndex] || '';
+        }
+
+
+        output.innerHTML += `<div><span>zsh ~ % </span></div>`;
+    </script>
+</body>
+
+</html>
